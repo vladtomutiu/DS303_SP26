@@ -346,9 +346,11 @@ Interpretation of Estimate coefficients:
 -   **your predictor**: Sepal.Length and Sepal.Width
 
     -   The sepal length coefficient represents the log odds for the iris to be classified as "virginica" for every one unit increase in sepal length, holding sepal width constant.
+
     -   Since the coefficient is positive, it means that for every one unit increase in sepal length, the log-odds of being classified as "virginica" increases, compared to "versicolor.
 
     -   The sepal width coefficient represents the log odds for the iris to be classified as "virginica" for every one unit increase in sepal width, holding sepal length constant.
+
     -   Since the coefficient is positive, it means that for every one unit increase in sepal width, the log-odds of being classified as "virginica" increases, compared to "versicolor.
 
 ## Try a new data set! `citrus`

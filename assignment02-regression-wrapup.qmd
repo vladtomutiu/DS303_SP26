@@ -1,0 +1,257 @@
+---
+title: "Assignment 2: Wrapping up regression"
+author: 
+  - "Vlad Tomutiu"
+  - "DS303, SP26"
+  - "Prof. Amber Camp"
+date: today
+format: html
+toc: true
+editor: visual
+theme: spacelab
+---
+
+# Wrapping up linear and logistic regression^\*^
+
+Assignment 2 covers linear and logistic regression models and includes many of the topics we have covered over the entire semester. You will be using `palmerpenguins` data, which includes a nice variety of continuous and categorical predictors.
+
+To submit this assignment, render this file and save as a pdf. Commit & push this qmd to GitHub and upload the pdf to Canvas.
+
+\*This assignment does not include mixed effects models, but you will be seeing that on another assignment.
+
+## Load Packages
+
+```{r, message = FALSE}
+library(lme4)
+library(tidyverse)
+# install.packages("palmerpenguins") # install if needed
+library(palmerpenguins)
+```
+
+## Load Data
+
+Load the `penguins` data and examine it below (use `summary()`, etc.)
+
+```{r}
+penguins <- penguins
+
+summary(penguins)
+??penguins
+```
+
+## Question 1: Describe the data
+
+What information is contained in this data set? Describe at least four variables (excluding `year`), including what they represent and their data type. Lastly, describe whether you think `year` would be a useful predictor in this data.
+
+**Answer**:\
+species - the type of penguin that is used in the data (Adelie, Chinstrap, and Gentoo), the data type is factor.
+
+sex - Whether the penguin is a male or female, the data type is also factor.
+
+body-mass_g - An integer of the body mass of the penguins in grams, the data type is integer.
+
+island - the type of island that the penguins are from (Biscoe, Dream, or Torgersen), the data type is factor.
+
+I think year would be a useful predictor for this data because different years have different events, causing changes to specific things that can be measured in the penguins data, for example a warmer year might mean less of a certain penguin on an island. This is why I think year could be a specific predictor in this data.
+
+## Question 2: EDA
+
+Explore your data visually. Create at least two visualizations that show the relationship between `flipper_length_mm` and its potential predictors.
+
+```{r, warning = FALSE}
+ggplot(penguins, aes(x = flipper_length_mm, y = bill_length_mm, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = island, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = species, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = bill_depth_mm, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = sex, color = species)) + geom_point()
+
+ggplot(penguins, aes(x = flipper_length_mm, y = year, color = species)) + geom_point()
+
+```
+
+## Question 3: Apply a linear regression
+
+Fit a simple linear regression model predicting `flipper_length_mm` from `body_mass_g`.
+
+```{r}
+penguins_f_bm <- lm(flipper_length_mm ~ body_mass_g, data = penguins)
+summary(penguins_f_bm)
+
+```
+
+Interpret your model output, including the intercept and slope, in your own words below. Be sure to include a sentence explaining how `body_mass_g` impacts `flipper_length_mm` and whether or not the effect is significant.
+
+**Answer:**\
+Intercept (136.7) - When body mass is 0 grams, then the flipper length in mm is 136.7
+
+slope (152.8) - For every one unit increase in body mass, flipper length increases by approximately 0.01528 grams and it is statistically significant.
+
+## Question 4: Apply a multiple linear regression
+
+Fit a linear regression model predicting `flipper_length_mm` from both `body_mass_g` and `bill_length_mm`. Interpret the slopes and intercept.
+
+```{r}
+penguins_fl <- lm(flipper_length_mm ~ body_mass_g + bill_length_mm, data = penguins)
+summary(penguins_fl)
+
+```
+
+Similar to Question 3, interpret the model output in your own words here:
+
+**Answer:**\
+Intercept (122.0) - When body mass is 0 grams and bill length is 0 millimeters, then the flipper length in millimeters is 122.0.
+
+the coefficient for body_mass_g is 0.01305, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.01305 grams and it is statistically significant.
+
+the coefficient for bill_length_mm is 0.5492, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.5492 millimeters and it is statistically significant.
+
+## Question 5: Include an interaction
+
+Fit a linear regression model predicting `flipper_length_mm` from `body_mass_g,` `bill_length_mm`, and the **interaction** of the two. Interpret the slopes and intercept.
+
+```{r}
+interaction <- lm(flipper_length_mm ~ body_mass_g + bill_length_mm + body_mass_g:bill_length_mm, data = penguins)
+summary(interaction)
+
+```
+
+Interpret the model output in your own words below. If there was a change in the pattern of significance, try to explain the logic below as well.
+
+**Answer:**
+
+Intercept (170.6) - The flipper length in millimeters is 170.6 when all other variables are zero.
+
+the coefficient for body_mass_g is 4.364e-04, indicating that for every one unit increase in body mass, flipper length increases by approximately 4.364e-04 grams and it is no longer statistically significant.
+
+the coefficient for bill_length_mm is -5.051e-01, indicating that for every one unit increase in body mass, flipper length decreases by approximately -5.051e-01 millimeters and it is also no longer statistically significant.
+
+The coefficient for body_mass_g:bill_length_mm is 2.707e-04, indicating that when body_mass_g increases by one unit, the effect of body_mass_g on bill_length_mm increases by 2.707e-04.
+
+There was a change in the pattern because body_mass_g and bill_length_mm are no longer statistically significant. The interaction between body_mass_g and bill_length_mm becomes much more significant then just the two variables independently, meaning that the interaction becomes statistically significant, while the coefficients of the individual variables decrease and they lose their significance.
+
+## Question 6: Compare models
+
+Compare the models you built in Questions 4 and 5 using `anova()`.
+
+```{r}
+anova(penguins_fl, interaction)
+
+anova(penguins_f_bm, interaction)
+
+```
+
+-   Which is the better model? How do you know?
+
+    -   **Answer:**\
+        The interaction model (Question 5) is better because the RSS is lower than the model from question 4.
+
+-   Is it possible to compare the models from Questions 3 and 5 using the same method? Why or why not?
+
+    -   **Answer:**
+
+        It is possible to compare the models from Question 3 and 5. As long as models are hierarchical, anova is able to compare the models and help us determine which model is better.\
+
+## Question 7: Categorical predictors
+
+Build a linear model that includes a categorical predictor of your choice. It is fine to stick with dummy coding. Optional: apply a different coding scheme AND interpret the output correctly for +1 extra credit.
+
+```{r}
+# assign dummy coding
+contrasts(penguins$island)
+
+# build and summarize your regression
+dummy <- lm(flipper_length_mm ~ island, data = penguins)
+summary(dummy)
+
+```
+
+-   What is the reference level of your categorical predictor?
+
+    -   **Answer:**
+
+        The reference level of my categorical predictor is the island Biscoe because it comes first alphabetically.
+
+-   What is your interpretation of this model output? Address all coefficients.
+
+    -   **Answer:**
+
+    -   The average flipper length of the penguins on island Biscoe is 209.7066 millimeters.
+
+    -   For the change from island Biscoe to island Dream, the flipper length of the penguins decrease by 16.634 millimeters and is statistically significant.
+
+    -   For the change from island Biscoe to island Torgersen, the flipper length of the penguins decrease by 18.5105 millimeters and is statistically significant.
+
+## Question 8: Relevel your categorical variable
+
+Relevel your categorical variable so that a **different** level becomes the reference. Then, run the same model you did in Question 7 and interpret the output.
+
+Relevel:
+
+```{r}
+
+
+penguins$island <- relevel(penguins$island, ref = "Dream")
+```
+
+Apply same model from Question 7:
+
+```{r}
+relevel <- lm(flipper_length_mm ~ island, data = penguins)
+summary(relevel)
+
+```
+
+-   What is the new reference level of your categorical predictor?
+
+    -   **Answer:**
+    -   The reference level of my categorical predictor is the island Dream because it comes first alphabetically.
+
+-   What is your interpretation of this new model output? Address all coefficients.
+
+    -   **Answer:**
+    -   The average flipper length of the penguins on island Dream is 193.073 millimeters.
+    -   For the change from island Dream to island Biscoe, the flipper length of the penguins increases by 16.634 millimeters and is statistically significant.
+    -   For the change from island Dream to island Torgersen, the flipper length of the penguins decrease by 1.877 millimeters and it is not statistically significant.
+
+## Question 9: Fit a logistic regression
+
+Apply a logistic regression. Include as many predictor variables as you'd like. Remember that your predicted outcome variable needs to be binary (or categorical with two levels).
+
+Hint: You could use `sex` or create a binary variable of your own (e.g., Gentoo vs. non-Gentoo) to test your model.
+
+```{r}
+logistic <- glm(sex ~ flipper_length_mm, data = penguins, family = binomial)
+summary(logistic)
+```
+
+What are your key takeaways from this model?
+
+**Answer:**\
+The intercept is -7.65801 and this is the log-odds of being a female when flipper length is zero. The coefficient flipper_length_mm represents the change in the log-odds of being a female for a one-unit increase in flipper length. Since the coefficient is positive, it suggests that **as flipper length increases, the log-odds of being a female also increases**.
+
+## Question 10: Synthesize the information
+
+Imagine you’re a biologist studying penguin populations. Which predictors do you think are most important to measure or record in the field to predict flipper length? Why?
+
+**Answer:**\
+The predictors I believe are most important to record in order to predict flipper length are island, bill depth, species, and body mass. Doing some EDA, I found that these 4 variables played the biggest role and had the biggest change in output when it came to flipper length. Using a combination of these variables, the biologists should be able to more accurately predict flipper length.
+
+## Bonus: Stepwise Regression
+
+Perform stepwise regression to find the best model for an outcome of your choice. You will likely encounter an error about missing values. Fixing that error and explaining your findings will earn you +2 extra credit. Show your work.
+
+```{r}
+
+
+```
+
+According to this stepwise regression, explain how the final model was selected.
+
+**Answer:**\
+(Write answer here)

@@ -107,9 +107,9 @@ Similar to Question 3, interpret the model output in your own words here:
 **Answer:**\
 Intercept (122.0) - When body mass is 0 grams and bill length is 0 millimeters, then the flipper length in millimeters is 122.0.
 
-the coefficient for body_mass_g is 0.01305, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.01305 grams and it is statistically significant.
+the coefficient for body_mass_g is 0.01305, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.01305 grams and it is statistically significant. While holding bill_length_mm constant.
 
-the coefficient for bill_length_mm is 0.5492, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.5492 millimeters and it is statistically significant.
+the coefficient for bill_length_mm is 0.5492, indicating that for every one unit increase in body mass, flipper length increases by approximately 0.5492 millimeters and it is statistically significant. While holding body_mass_g constant.
 
 ## Question 5: Include an interaction
 
@@ -155,7 +155,7 @@ anova(penguins_f_bm, interaction)
 
     -   **Answer:**
 
-        It is possible to compare the models from Question 3 and 5. As long as models are hierarchical, anova is able to compare the models and help us determine which model is better.\
+        It is possible to compare the models from Question 3 and 5. As long as the models are hierarchical and nested, anova is able to compare the models and help us determine which model is better.\
 
 ## Question 7: Categorical predictors
 
@@ -183,9 +183,9 @@ summary(dummy)
 
     -   The average flipper length of the penguins on island Biscoe is 209.7066 millimeters.
 
-    -   For the change from island Biscoe to island Dream, the flipper length of the penguins decrease by 16.634 millimeters and is statistically significant.
+    -   For the change from island Biscoe to island Dream, the flipper length of the penguins decrease by 16.634 millimeters and is statistically significant, holding island Torgersen constant.
 
-    -   For the change from island Biscoe to island Torgersen, the flipper length of the penguins decrease by 18.5105 millimeters and is statistically significant.
+    -   For the change from island Biscoe to island Torgersen, the flipper length of the penguins decrease by 18.5105 millimeters and is statistically significant, holding island Dream constant.
 
 ## Question 8: Relevel your categorical variable
 
@@ -194,8 +194,6 @@ Relevel your categorical variable so that a **different** level becomes the refe
 Relevel:
 
 ```{r}
-
-
 penguins$island <- relevel(penguins$island, ref = "Dream")
 ```
 
@@ -216,8 +214,8 @@ summary(relevel)
 
     -   **Answer:**
     -   The average flipper length of the penguins on island Dream is 193.073 millimeters.
-    -   For the change from island Dream to island Biscoe, the flipper length of the penguins increases by 16.634 millimeters and is statistically significant.
-    -   For the change from island Dream to island Torgersen, the flipper length of the penguins decrease by 1.877 millimeters and it is not statistically significant.
+    -   For the change from island Dream to island Biscoe, the flipper length of the penguins increases by 16.634 millimeters and is statistically significant, holding island Torgersen constant.
+    -   For the change from island Dream to island Torgersen, the flipper length of the penguins decrease by 1.877 millimeters and it is not statistically significant, holding island Biscoe constant.
 
 ## Question 9: Fit a logistic regression
 
@@ -233,7 +231,7 @@ summary(logistic)
 What are your key takeaways from this model?
 
 **Answer:**\
-The intercept is -7.65801 and this is the log-odds of being a female when flipper length is zero. The coefficient flipper_length_mm represents the change in the log-odds of being a female for a one-unit increase in flipper length. Since the coefficient is positive, it suggests that **as flipper length increases, the log-odds of being a female also increases**.
+The intercept is -7.65801 and this is the log-odds of being a female when flipper length is zero. The coefficient flipper_length_mm represents the change in the log-odds of being a male for a one-unit increase in flipper length. Since the coefficient is positive, it suggests that **as flipper length increases, the log-odds of being a male also increases**.
 
 ## Question 10: Synthesize the information
 

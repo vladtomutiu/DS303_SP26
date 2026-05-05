@@ -198,6 +198,27 @@ AIC(interaction_controldrib1, model_club)
 ```
 
 ```{r}
+### notes:
+
+#Intercept = 56.82 -Baseline rating when all predictors = 0 (not meaningful by itself, since players don’t have zero skills).
+
+#Age = +0.452 -For each additional year of age, Rating increases by 0.45 points, holding skills constant.
+
+#Short_Pass = +0.169 Each 1‑point increase in Short Pass increases Rating by 0.17 points.
+
+#Ball_Control = –0.155
+#Dribbling = –0.630
+
+#These negative main effects do not mean “worse Ball Control equals lower rating.”  
+
+#They simply mean when Dribbling (or Ball Control) is held at zero, the other has a negative slope.
+
+#Interaction (Ball_Control × Dribbling) = +0.00907
+
+#When Ball Control increases, the effect of Dribbling becomes more positive and vice versa 
+
+#In soccer terms: Players who are good at both Ball Control and Dribbling get a bonus that is larger than the sum of the parts.
+
 
 ```
 

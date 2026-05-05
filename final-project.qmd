@@ -138,8 +138,7 @@ anova(FifaMR, Fifanofinish)
 Using linear regression I found that the factors with the greatest impact on Rating based on R-squared were Age, Short_Pass, Long_Pass, Ball_Control, Dribbling, and Finishing. These all combined also resulted in the model that best predicts Rating.
 :::
 
-:::: columns
-
+::: columns
 ::: {.column width = "50%"}
 
 ```{r, echo=TRUE}
@@ -183,8 +182,7 @@ anova(FifaMR, Fifanofinish)
 My Mixed effects models is predicting Rating using Age, Short_Pass, and the interaction between Ball_Control and Dribbling, while allowing each position and similarly each club to have its own baseline (random intercept).
 :::
 
-:::: columns
-
+::: columns
 ::: {.column width = "50%"}
 
 ```{r, echo=TRUE}

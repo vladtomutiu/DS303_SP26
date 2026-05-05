@@ -1,0 +1,228 @@
+---
+title: "Behind the OVR"
+subtitle: "Which FIFA 17 Attributes Truly Predict Player Quality?"
+author: "Vlad Tomutiu"
+institute: "Chaminade University"
+date: 5/5/26
+format: 
+  revealjs:
+    theme: moon
+editor: visual
+---
+
+## Introduction/Background
+
+FIFA 17 uses a variety of different player factors to create an Overall Rating for every soccer player. These factors are made to model the real world, and try to do the best job and accurately describing a players abilities and influence within the sport. This brings us to the question, which factors/attributes play the biggest role in determining a players Overall Rating?
+
+## Question and why it matters
+
+Which factors/attributes matter most for predicting a player’s Overall Rating?
+
+Why it matters:
+
+-   Understanding rating logic (why certain factors are more important then others)
+
+-   Evaluating fairness and realism (to real world soccer)
+
+-   context (like how a players club can help predict Rating)
+
+## Hypothesis
+
+I believe age will be a big factor in a players Overall Rating, as over time, as players get older they tend to get better. Although at a certain age players regress, I still believe it will be a big factor because in general, only the best continue to play at older ages. Technical skills like ball control, dribbling, and passing will likely have a major impact on a player’s Overall Rating because strong technical ability is important for every position. Shooting and defending should also matter a lot, attacking players are rated highly for their scoring ability, while defending is equally important since it makes up half the game.
+
+## Diving into the Data
+
+The data set `FullData.csv` contains player information and statistics from FIFA 17, including each player’s Overall Rating and a variety of attributes. The data set was created and added to Kaggle by Ekrem Bayar.
+
+-   The outcome variable in this analysis is `Rating`, which is a measure of each individual player’s overall ability in the game
+
+-   Some key variables that I found in the list of attributes included `Short_Pass`, `Long_Pass`, `Ball_Control`, `Dribbling`, `Standing_Tackle`, and `Finishing`. I also considered `Age`, because I considered it a key component that can determine how good a player is.
+
+-   Together, these variables capture qualities that influence a player’s overall rating.
+
+    ```{r, echo=TRUE, output=FALSE}
+    my_data <- read.csv("FullData.csv")
+    summary(my_data)
+    ```
+
+## Full Data Summary
+
+```{r}
+my_data <- read.csv("FullData.csv")
+summary(my_data)
+```
+
+## Data Visualization
+
+::::: columns
+::: column
+Doing some early EDA, here are some graphs with specific variables I chose that I thought may be good potential predictors for overall rating.
+:::
+
+::: column
+```{r}
+
+library(plotly) 
+library(ggplot2)  
+
+# your exploratory visualizations here 
+ggplot(my_data, aes(x = Age, y = Rating, color = Age)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Relationship Between Age and Overall Rating",
+  )
+ 
+
+ggplot(my_data, aes(x = Sliding_Tackle, y = Rating, color = Sliding_Tackle)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(
+    title = "Relationship Between Sliding Tackle and Overall Rating",
+  )
+
+```
+:::
+:::::
+
+## Linear Regression Models {.smaller}
+
+I used linear regression models to analyzed variables I thought could be good predictors based on my EDA.
+
+Interpreting the output, when the Short_Pass attribute is 0 , then the Overall Rating is 52.53. For every one unit increase in Short_Pass, Overall Rating increases by approximately 0.2346 Ratings and it is statistically significant.
+
+```{r, echo=TRUE}
+fifa_stats11 <- lm(Rating ~ Short_Pass, data = my_data)
+summary(fifa_stats11)
+```
+
+## Multiple Linear regression
+
+::: r-fit-text
+Using linear regression I found that the factors with the greatest impact on Rating based on R-squared were Age, Short_Pass, Long_Pass, Ball_Control, Dribbling, and Finishing. These all combined also resulted in the model that best predicts Rating.
+:::
+
+::: columns
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+FifaMR <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control + Dribbling + Finishing, data = my_data)
+summary(FifaMR)
+```
+:::
+
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+Fifanofinish <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control + Dribbling, data = my_data)
+summary(Fifanofinish)
+```
+
+:::
+
+::::
+
+## Multiple Linear regression comparison
+
+<br>
+
+```{r, echo=TRUE}
+anova(FifaMR, Fifanofinish)
+```
+
+## Interactions
+
+::: r-fit-text
+Using linear regression I found that the factors with the greatest impact on Rating based on R-squared were Age, Short_Pass, Long_Pass, Ball_Control, Dribbling, and Finishing. These all combined also resulted in the model that best predicts Rating.
+:::
+
+:::: columns
+
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+
+interaction_age <- lm(Rating ~ Age * (Short_Pass + Long_Pass + Ball_Control + Dribbling), data = my_data) 
+summary(interaction_age)
+```
+:::
+
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+
+interaction_controldrib1 <- lm(Rating ~ Age + Short_Pass + Ball_Control * Dribbling, data = my_data) 
+summary(interaction_controldrib1)
+```
+
+:::
+
+::::
+
+## Interactions comparison
+
+The best interactions were between dribbling/ball control and ball control/finishing
+
+```{r, results='hide'}
+nteraction_controldrib1 <- lm(Rating ~ Age + Short_Pass + Ball_Control * Dribbling, data = my_data)
+summary(interaction_controldrib1)
+
+interaction_controlfinish1 <- lm(Rating ~ Age + Short_Pass + Dribbling + Ball_Control * Finishing, data = my_data)
+summary(interaction_controlfinish1)
+```
+
+```{r, echo=TRUE}
+anova(FifaMR, Fifanofinish)
+```
+
+## Mixed Effects Models
+
+::: r-fit-text
+Mixed effects models can account for modeling specific clubs and positions as a random effect, allowing us to see the variability between different clubs and position through random effects.
+:::
+
+:::: columns
+
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+
+library(lme4)
+
+model_pos <- lmer(
+  Rating ~ Age + Short_Pass + Ball_Control * Dribbling + (1 | Club_Position),
+  data = my_data
+)
+summary(model_pos)
+```
+:::
+
+::: {.column width = "50%"}
+
+```{r, echo=TRUE}
+
+model_club <- lmer(
+  Rating ~ Age + Short_Pass + Ball_Control * Dribbling + (1 | Club),
+  data = my_data
+)
+summary(model_club)
+```
+
+:::
+
+::::
+
+## Final Comparisons
+
+-   Compare the mixed effects models using AIC since it is not hierarchical like ANOVA
+
+-   Then compare the best mixed effect model with the best interactive model using AIC
+
+```{r, echo=TRUE}
+AIC(model_pos, model_club) 
+AIC(interaction_controldrib1, model_club)
+```
+
+# THANK YOU!

@@ -1,0 +1,246 @@
+---
+title: "project work"
+format: html
+editor: visual
+---
+
+```{r}
+my_data <- read.csv("FullData.csv")
+summary(my_data)
+skim <- skimr::skim(my_data)
+```
+
+```{r}
+library(plotly)
+library(ggplot2)
+
+# your exploratory visualizations here
+ggplot(my_data, aes(x = Height, y = Rating, color = Height)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() 
+
+ggplot(my_data, aes(x = Weight, y = Rating, color = Weight)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() 
+
+ggplot(my_data, aes(x = Age, y = Rating, color = Age)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() 
+
+ggplot(my_data, aes(x = Dribbling, y = Rating, color = Dribbling)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()  
+
+ggplot(my_data, aes(x = Finishing, y = Rating, color = Finishing)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Ball_Control, y = Rating, color = Ball_Control)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Speed, y = Rating, color = Speed)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Weak_foot, y = Rating, color = Weak_foot)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Standing_Tackle, y = Rating, color = Standing_Tackle)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Sliding_Tackle, y = Rating, color = Sliding_Tackle)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Standing_Tackle, y = Rating, color = Long_Pass)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+ggplot(my_data, aes(x = Sliding_Tackle, y = Rating, color = Short_Pass)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+```
+
+```{r}
+fifa_stats <- lm(Rating ~ Ball_Control, data = my_data)
+summary(fifa_stats)
+
+fifa_stats1 <- lm(Rating ~ Age, data = my_data)
+summary(fifa_stats1)
+
+fifa_stats7 <- lm(Rating ~ Dribbling, data = my_data)
+summary(fifa_stats7)
+
+fifa_stats8 <- lm(Rating ~ Finishing, data = my_data)
+summary(fifa_stats8)
+
+fifa_stats9 <- lm(Rating ~ Standing_Tackle, data = my_data)
+summary(fifa_stats9)
+
+fifa_stats10 <- lm(Rating ~ Sliding_Tackle, data = my_data)
+summary(fifa_stats10)
+
+fifa_stats11 <- lm(Rating ~ Short_Pass, data = my_data)
+summary(fifa_stats11)
+
+fifa_stats12 <- lm(Rating ~ Long_Pass, data = my_data)
+summary(fifa_stats12)
+```
+
+```{r}
+FifaMR <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control + Dribbling + Finishing, data = my_data)
+summary(FifaMR)
+
+Fifanofinish <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control + Dribbling, data = my_data)
+summary(Fifanofinish)
+
+FifaMR_nodribfinish <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control, data = my_data)
+summary(FifaMR_nodribfinish)
+
+FifaMR_def <- lm(Rating ~ Short_Pass + Long_Pass + Ball_Control + Dribbling + Finishing + Standing_Tackle, data = my_data)
+summary(FifaMR_def)
+```
+
+```{r}
+anova(FifaMR, Fifanofinish) #adding an entire variable in FifaMR, and it is only very slightly better
+```
+
+```{r}
+# interactions
+
+# technical skills may have an impact at older age, interaction age and technical attributes
+interaction_age <- lm(Rating ~ Age * (Short_Pass + Long_Pass + Ball_Control + Dribbling), data = my_data)
+summary(interaction_age)
+
+interaction_age1 <- lm(Rating ~ Age * (Ball_Control + Dribbling), data = my_data)
+summary(interaction_age1)
+
+# dribbling and ball control very closely related
+interaction_controldrib <- lm(Rating ~ Age + Short_Pass + Long_Pass + Ball_Control * Dribbling, data = my_data)
+summary(interaction_controldrib)
+
+interaction_controldrib1 <- lm(Rating ~ Age + Short_Pass + Ball_Control * Dribbling, data = my_data)
+summary(interaction_controldrib1)
+
+#interactions between passing
+interaction_pass <- lm(Rating ~ Age + Ball_Control + Dribbling + Short_Pass * Long_Pass, data = my_data)
+summary(interaction_pass)
+
+interaction_controlfinish <- lm(Rating ~ Age + Short_Pass + Long_Pass + Dribbling + Ball_Control * Finishing, data = my_data)
+summary(interaction_controlfinish)
+
+interaction_controlfinish1 <- lm(Rating ~ Age + Short_Pass + Dribbling + Ball_Control * Finishing, data = my_data)
+summary(interaction_controlfinish1)
+
+# bein g able to dribble at older ages sets you aparrt, dribbling normally only for great physical players
+interaction_old_dribble <- lm(Rating ~ Age * Dribbling + Short_Pass + Long_Pass + Ball_Control, data = my_data)
+summary(interaction_old_dribble)
+```
+
+```{r}
+# best interactions: between dribbling and ball control and ball control and finishing
+
+interaction_controldrib1 <- lm(Rating ~ Age + Short_Pass + Ball_Control * Dribbling, data = my_data)
+summary(interaction_controldrib1)
+
+interaction_controlfinish1 <- lm(Rating ~ Age + Short_Pass + Dribbling + Ball_Control * Finishing, data = my_data)
+summary(interaction_controlfinish1)
+```
+
+```{r}
+anova(interaction_controldrib1, interaction_controlfinish1)
+#control drib moa bettah  
+```
+
+```{r}
+library(lme4)
+
+model_pos <- lmer(
+  Rating ~ Age + Short_Pass + Ball_Control * Dribbling + (1 | Club_Position),
+  data = my_data
+)
+summary(model_pos)
+
+model_club <- lmer(
+  Rating ~ Age + Short_Pass + Ball_Control * Dribbling + (1 | Club),
+  data = my_data
+)
+summary(model_club)
+```
+
+```{r}
+
+
+AIC(model_pos, model_club) # compare using this as anova is hierarchical
+#model_club is better
+
+# compare before mixed effects
+AIC(interaction_controldrib1, model_club)
+#model_club is better (best model)
+
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

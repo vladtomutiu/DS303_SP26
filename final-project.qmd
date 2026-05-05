@@ -180,7 +180,7 @@ anova(FifaMR, Fifanofinish)
 ## Mixed Effects Models
 
 ::: r-fit-text
-Mixed effects models can account for modeling specific clubs and positions as a random effect, allowing us to see the variability between different clubs and position through random effects.
+My Mixed effects models is predicting Rating using Age, Short_Pass, and the interaction between Ball_Control and Dribbling, while allowing each position and similarly each club to have its own baseline (random intercept).
 :::
 
 :::: columns
